@@ -17,15 +17,21 @@ class MainWindow(QMainWindow):
         # Added the upper menu
         file_menu_item = self.menuBar().addMenu("&File")
         help_menu_item = self.menuBar().addMenu("&Help")
+        edit_menu_item = self.menuBar().addMenu("&Edit")
 
-        # Add a sub option into the option "File"
+        # Add the sub option "Add Student" into the option "File"
         add_student_action = QAction("Add Student", self)
         add_student_action.triggered.connect(self.insert)
         file_menu_item.addAction(add_student_action)
 
-        # Add a sub option into the option "Help"
+        # Add the sub option "About "into the option "Help"
         about_action = QAction("About", self)
         help_menu_item.addAction(about_action)
+
+        # Add the sub option "Search" into the option "Edit"
+        search_student_action = QAction("Search", self)
+        search_student_action.triggered.connect(self.search)
+        edit_menu_item.addAction(search_student_action)
 
         # Made the table that would display the students informations
         self.table = QTableWidget()
@@ -51,8 +57,14 @@ class MainWindow(QMainWindow):
                                    QTableWidgetItem(str(data)))
         connection.close()
 
+    # Function to connect the Main Window to the Add Student Window
     def insert(self):
         dialog = InsertDialog()
+        dialog.exec()
+
+    # Function to connect the Main Window to the Search Student Window
+    def search(self):
+        dialog = SearchDialog()
         dialog.exec()
 
 
@@ -102,6 +114,28 @@ class InsertDialog(QDialog):
         connection.close()
 
         main_window.load_data()
+
+
+class SearchDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("Search Student")
+        self.setFixedWidth(300)
+        self.setFixedHeight(300)
+
+        layout = QVBoxLayout()
+
+        # Add student name text box widget
+        student_name = QLineEdit()
+        student_name.setPlaceholderText("Name:")
+        layout.addWidget(student_name)
+
+        # Add "Search button widget"
+        button = QPushButton("Search")
+        layout.addWidget(button)
+
+        self.setLayout(layout)
 
 
 app = QApplication(sys.argv)
