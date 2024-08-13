@@ -1,3 +1,4 @@
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (QApplication, QVBoxLayout, QLabel, QWidget,
                              QGridLayout, QLineEdit, QPushButton, QMainWindow,
                              QTableWidget, QTableWidgetItem, QDialog,
@@ -127,15 +128,30 @@ class SearchDialog(QDialog):
         layout = QVBoxLayout()
 
         # Add student name text box widget
-        student_name = QLineEdit()
-        student_name.setPlaceholderText("Name:")
-        layout.addWidget(student_name)
+        self.student_name = QLineEdit()
+        self.student_name.setPlaceholderText("Name:")
+        layout.addWidget(self.student_name)
 
         # Add "Search button widget"
         button = QPushButton("Search")
+        button.clicked.connect(self.search)
         layout.addWidget(button)
 
         self.setLayout(layout)
+
+    def search(self):
+        name = self.student_name.text()
+        connection = sqlite3.connect("database.db")
+        cursor = connection.cursor()
+        # It's necessary that name is written as (name,) because the execute()
+        # method expect a tuple
+        result = cursor.execute("select * from students where name = ?",
+                                (name,))
+        items = main_window.table.findItems(name, Qt.MatchFlag.MatchFixedString)
+        for item in items:
+            main_window.table.item(item.row(), 1).setSelected(True)
+        cursor.close()
+        connection.close()
 
 
 app = QApplication(sys.argv)
